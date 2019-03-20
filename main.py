@@ -82,9 +82,9 @@ def reconstruct_check(sess, model, images):
         os.mkdir("reconstr_img")
 
     for i in range(len(images)):
-        org_img = images[i].reshape(64, 64)
+        org_img = images[i].reshape([flags.input_width, flags.input_height, flags.input_channels])
         org_img = org_img.astype(np.float32)
-        reconstr_img = x_reconstruct[i].reshape(64, 64)
+        reconstr_img = x_reconstruct[i].reshape([flags.input_width, flags.input_height, flags.input_channels])
         imsave("reconstr_img/org_{0}.png".format(i), org_img)
         imsave("reconstr_img/reconstr_{0}.png".format(i), reconstr_img)
 
@@ -101,7 +101,7 @@ def disentangle_check(sess, model, manager, save_original=False):
     '''
     img = manager.get_image(1337)
     if save_original:
-        imsave("original.png", img.reshape(64, 64).astype(np.float32))
+        imsave("original.png", img.reshape([flags.input_width, flags.input_height, flags.input_channels]).astype(np.float32))
 
     batch_xs = [img]
     z_mean, z_log_sigma_sq = model.transform(sess, batch_xs)
@@ -131,7 +131,7 @@ def disentangle_check(sess, model, manager, save_original=False):
                 else:
                     z_mean2[0][i] = z_m[i]
             reconstr_img = model.generate(sess, z_mean2)
-            rimg = reconstr_img[0].reshape(64, 64)
+            rimg = reconstr_img[0].reshape([flags.input_width, flags.input_height, flags.input_channels])
             imsave("disentangle_img/check_z{0}_{1}.png".format(target_z_index, ri), rimg)
 
 
