@@ -139,17 +139,17 @@ class VAE(object):
       W_conv2, b_conv2 = self._conv2d_weight_variable([4, 4, 32, 32], "conv2")
       W_conv3, b_conv3 = self._conv2d_weight_variable([4, 4, 32, 32], "conv3")
       W_conv4, b_conv4 = self._conv2d_weight_variable([4, 4, 32, 32], "conv4")
-      W_fc1, b_fc1     = self._fc_weight_variable([4*4*32, 256], "fc1")
-      W_fc2, b_fc2     = self._fc_weight_variable([256, 256], "fc2")
-      W_fc3, b_fc3     = self._fc_weight_variable([256, 10],  "fc3")
-      W_fc4, b_fc4     = self._fc_weight_variable([256, 10],  "fc4")
+      W_fc1, b_fc1     = self._fc_weight_variable([8*8*32, 512], "fc1")
+      W_fc2, b_fc2     = self._fc_weight_variable([512, 512], "fc2")
+      W_fc3, b_fc3     = self._fc_weight_variable([512, 10],  "fc3")
+      W_fc4, b_fc4     = self._fc_weight_variable([512, 10],  "fc4")
 
       x_reshaped = tf.reshape(x, [-1, self.input_width, self.input_height, self.input_channels])
       h_conv1 = tf.nn.relu(self._conv2d(x_reshaped, W_conv1, 2) + b_conv1) # (32, 32)
       h_conv2 = tf.nn.relu(self._conv2d(h_conv1,    W_conv2, 2) + b_conv2) # (16, 16)
       h_conv3 = tf.nn.relu(self._conv2d(h_conv2,    W_conv3, 2) + b_conv3) # (8, 8)
       h_conv4 = tf.nn.relu(self._conv2d(h_conv3,    W_conv4, 2) + b_conv4) # (4, 4)
-      h_conv4_flat = tf.reshape(h_conv4, [-1, 4*4*32])
+      h_conv4_flat = tf.reshape(h_conv4, [-1, 8*8*32])
       h_fc1 = tf.nn.relu(tf.matmul(h_conv4_flat, W_fc1) + b_fc1)
       h_fc2 = tf.nn.relu(tf.matmul(h_fc1,        W_fc2) + b_fc2)
       z_mean         = tf.matmul(h_fc2, W_fc3) + b_fc3
@@ -159,8 +159,8 @@ class VAE(object):
   
   def _create_generator_network(self, z, reuse=False):
     with tf.variable_scope("gen", reuse=reuse) as scope:
-      W_fc1, b_fc1 = self._fc_weight_variable([10,  256],    "fc1")
-      W_fc2, b_fc2 = self._fc_weight_variable([256, 4*4*32], "fc2")
+      W_fc1, b_fc1 = self._fc_weight_variable([10,  512],    "fc1")
+      W_fc2, b_fc2 = self._fc_weight_variable([512, 8*8*32], "fc2")
 
       # [filter_height, filter_width, output_channels, in_channels]
       W_deconv1, b_deconv1 = self._conv2d_weight_variable([4, 4, 32, 32], "deconv1", deconv=True)
@@ -170,9 +170,9 @@ class VAE(object):
 
       h_fc1 = tf.nn.relu(tf.matmul(z,     W_fc1) + b_fc1)
       h_fc2 = tf.nn.relu(tf.matmul(h_fc1, W_fc2) + b_fc2)
-      h_fc2_reshaped = tf.reshape(h_fc2, [-1, 4, 4, 32])
-      h_deconv1   = tf.nn.relu(self._deconv2d(h_fc2_reshaped, W_deconv1,  4,  4, 2) + b_deconv1)
-      h_deconv2   = tf.nn.relu(self._deconv2d(h_deconv1,      W_deconv2,  8,  8, 2) + b_deconv2)
+      h_fc2_reshaped = tf.reshape(h_fc2, [-1, 8, 8, 32])
+      h_deconv1   = tf.nn.relu(self._deconv2d(h_fc2_reshaped, W_deconv1,  8,  8, 2) + b_deconv1)
+      h_deconv2   = tf.nn.relu(self._deconv2d(h_deconv1,      W_deconv2,  16,  16, 2) + b_deconv2)
       h_deconv3   = tf.nn.relu(self._deconv2d(h_deconv2,      W_deconv3, 32, 32, 2) + b_deconv3)
       h_deconv4   =            self._deconv2d(h_deconv3,      W_deconv4, 64, 64, 2) + b_deconv4
       
