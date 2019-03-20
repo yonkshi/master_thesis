@@ -1,2 +1,7 @@
 .idea/*
 data/
+log/
+tensor2tensor/
+transformer/
+__pycache__/
+disentangled_vae/

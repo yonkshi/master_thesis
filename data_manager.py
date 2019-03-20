@@ -4,47 +4,33 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import tensorflow as tf
+
+flags = tf.app.flags.FLAGS
 
 class DataManager(object):
   def load(self):
     # Load dataset
-    dataset_zip = np.load('data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz',
-                          encoding = 'latin1')
+    dataset_zip = np.load('data/megaman.npz')
 
-    # print('Keys in the dataset:', dataset_zip.keys())
-    #  ['metadata', 'imgs', 'latents_classes', 'latents_values']
-
-    self.imgs       = dataset_zip['imgs']
-    latents_values  = dataset_zip['latents_values']
-    latents_classes = dataset_zip['latents_classes']
-    metadata        = dataset_zip['metadata'][()]
-
-    # Define number of values per latents and functions to convert to indices
-    latents_sizes = metadata['latents_sizes']
-    # [ 1,  3,  6, 40, 32, 32]
-    # color, shape, scale, orientation, posX, posY
-
-    self.n_samples = latents_sizes[::-1].cumprod()[-1]
-    # 737280
-
-    self.latents_bases = np.concatenate((latents_sizes[::-1].cumprod()[::-1][1:],
-                                         np.array([1,])))
-    # [737280, 245760, 40960, 1024, 32, 1]
+    self.imgs       = dataset_zip['arr_0']
+    self.n_samples = self.imgs.shape[0]
+    # 27312 for megaman
     
   @property
   def sample_size(self):
     return self.n_samples
 
-  def get_image(self, shape=0, scale=0, orientation=0, x=0, y=0):
-    latents = [0, shape, scale, orientation, x, y]
-    index = np.dot(latents, self.latents_bases).astype(int)
-    return self.get_images([index])[0]
+  def get_image(self, index):
+    img = self.imgs[index]
+    image_size = flags.input_width * flags.input_height * flags.input_channels
+    img = img.reshape(image_size)
+    return img
 
   def get_images(self, indices):
     images = []
     for index in indices:
-      img = self.imgs[index]
-      img = img.reshape(4096)
+      img = self.get_image(index)
       images.append(img)
     return images
 

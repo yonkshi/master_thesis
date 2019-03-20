@@ -166,3 +166,28 @@ def multihead_attention(queries, keys, values,
         outputs = ln(outputs)
 
     return outputs
+
+
+def ff(inputs, num_units, scope="positionwise_feedforward"):
+    '''position-wise feed forward net. See 3.3
+
+    inputs: A 3d tensor with shape of [N, T, C].
+    num_units: A list of two integers.
+    scope: Optional scope for `variable_scope`.
+    Returns:
+      A 3d tensor with the same shape and dtype as inputs
+    '''
+    with tf.variable_scope(scope, reuse=tf.AUTO_REUSE):
+        # Inner layer
+        outputs = tf.layers.dense(inputs, num_units[0], activation=tf.nn.relu)
+
+        # Outer layer
+        outputs = tf.layers.dense(outputs, num_units[1])
+
+        # Residual connection
+        outputs += inputs
+
+        # Normalize
+        outputs = ln(outputs)
+
+    return outputs
