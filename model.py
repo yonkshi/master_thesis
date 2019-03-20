@@ -173,8 +173,8 @@ class VAE(object):
       h_fc2_reshaped = tf.reshape(h_fc2, [-1, 4, 4, 32])
       h_deconv1   = tf.nn.relu(self._deconv2d(h_fc2_reshaped, W_deconv1,  4,  4, 2) + b_deconv1)
       h_deconv2   = tf.nn.relu(self._deconv2d(h_deconv1,      W_deconv2,  8,  8, 2) + b_deconv2)
-      h_deconv3   = tf.nn.relu(self._deconv2d(h_deconv2,      W_deconv3, 16, 16, 2) + b_deconv3)
-      h_deconv4   =            self._deconv2d(h_deconv3,      W_deconv4, 32, 32, 2) + b_deconv4
+      h_deconv3   = tf.nn.relu(self._deconv2d(h_deconv2,      W_deconv3, 32, 32, 2) + b_deconv3)
+      h_deconv4   =            self._deconv2d(h_deconv3,      W_deconv4, 64, 64, 2) + b_deconv4
       
       x_out_logit = tf.reshape(h_deconv4, [-1, self.input_width * self.input_height * self.input_channels]) # 128x128x3
       return x_out_logit
