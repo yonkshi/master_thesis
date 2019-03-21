@@ -25,7 +25,10 @@ def main():
     imgs   = dataset_zip['arr_0']
     print('writing and compressing lzf')
     with h5py.File('data/megaman.hdf5', "w") as f:
-        f.create_dataset('megaman', data = imgs, compression='lzf')
+        f.create_dataset('megaman',
+                         data = imgs,
+                         chunks = (10, 128, 128, 3), # 10 images per chunk
+                         compression='lzf')
 
 
 if __name__ == '__main__':
