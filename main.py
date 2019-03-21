@@ -45,6 +45,7 @@ run_name = "gamma={0}, capacity_lim={1}, latent_dim={2}, input_dim={3}x{4}x{5}, 
                               datetime.datetime.now(),
                               )
 run_logpath = os.path.join(flags.log_file, run_name)
+run_checkpoint_path = os.path.join(flags.checkpoint_dir, run_name)
 if not os.path.exists(run_logpath):
     os.mkdir(run_logpath)
 
@@ -102,7 +103,7 @@ def train(sess,
         summary_writer.add_summary(img_summary, step)
 
         # Save checkpoint
-        saver.save(sess, flags.checkpoint_dir + '/' + 'checkpoint', global_step=step)
+        saver.save(sess, run_checkpoint_path + '/' + 'checkpoint', global_step=step)
 
 
 def reconstruct_check(sess, model, images):
@@ -173,14 +174,14 @@ def disentangle_check(sess, model, manager, save_original=False):
 
 def load_checkpoints(sess):
     saver = tf.train.Saver()
-    checkpoint = tf.train.get_checkpoint_state(flags.checkpoint_dir)
+    checkpoint = tf.train.get_checkpoint_state(run_checkpoint_path)
     if checkpoint and checkpoint.model_checkpoint_path:
         saver.restore(sess, checkpoint.model_checkpoint_path)
         print("loaded checkpoint: {0}".format(checkpoint.model_checkpoint_path))
     else:
         print("Could not find old checkpoint")
-        if not os.path.exists(flags.checkpoint_dir):
-            os.mkdir(flags.checkpoint_dir)
+        if not os.path.exists(run_checkpoint_path):
+            os.mkdir(run_checkpoint_path)
     return saver
 
 
