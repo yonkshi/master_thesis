@@ -15,8 +15,8 @@ from data_manager import DataManager
 
 tf.app.flags.DEFINE_integer("epoch_size", 2000, "epoch size")
 tf.app.flags.DEFINE_integer("batch_size", 64, "batch size")
-tf.app.flags.DEFINE_float("gamma", 100.0, "gamma param for latent loss")
-tf.app.flags.DEFINE_float("capacity_limit", 80.0,
+tf.app.flags.DEFINE_float("gamma", 1000.0, "gamma param for latent loss")
+tf.app.flags.DEFINE_float("capacity_limit", 30.0,
                           "encoding capacity limit param for latent loss")
 tf.app.flags.DEFINE_integer("capacity_change_duration", 100000,
                             "encoding capacity change duration")
