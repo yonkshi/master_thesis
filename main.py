@@ -57,7 +57,7 @@ def train(sess,
     summary_writer = tf.summary.FileWriter(run_logpath, sess.graph)
 
     n_samples = manager.sample_size
-
+    np.random.seed(1231)
     reconstruct_check_images = manager.get_random_images(10)
 
     indices = list(range(n_samples))
