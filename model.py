@@ -242,20 +242,20 @@ class VAE(object):
         # Original VAE output
 
         # Tensorboard integration
-        imgs = []
-        for i in range(len(xs)):
-            tf_x_reshaped = tf.reshape(self.x[i], [flags.input_width, flags.input_height, flags.input_channels])
-            tf_x_out_reshaped = tf.reshape(self.x_out[i], [flags.input_width, flags.input_height, flags.input_channels])
-            combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 0)
-            reconstr_img = tf.summary.image("reconstr_img {0}".format(i), combined_image)
-            imgs.append(reconstr_img)
+        # imgs = []
+        # for i in range(len(xs)):
+        #     tf_x_reshaped = tf.reshape(self.x[i], [flags.input_width, flags.input_height, flags.input_channels])
+        #     tf_x_out_reshaped = tf.reshape(self.x_out[i], [flags.input_width, flags.input_height, flags.input_channels])
+        #     combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 0)
+        #     reconstr_img = tf.summary.image("reconstr_img {0}".format(i), combined_image)
+        #     imgs.append(reconstr_img)
+        #
+        # img_summary = tf.summary.merge(imgs)
 
-        img_summary = tf.summary.merge(imgs)
-
-        tf_x_reshaped = tf.reshape(self.x, [flags.input_width, flags.input_height, flags.input_channels])
-        tf_x_out_reshaped = tf.reshape(self.x_out, [flags.input_width, flags.input_height, flags.input_channels])
+        tf_x_reshaped = tf.reshape(self.x, [-1, flags.input_width, flags.input_height, flags.input_channels])
+        tf_x_out_reshaped = tf.reshape(self.x_out, [-1, flags.input_width, flags.input_height, flags.input_channels])
         combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 1)
-        img_summary = tf.summary.image("reconstr_img {0}".format(i), combined_image)
+        img_summary = tf.summary.image("reconstr_img", combined_image)
 
         return sess.run([self.x_out, img_summary],
                         feed_dict={self.x: xs})
