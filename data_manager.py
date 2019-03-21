@@ -12,11 +12,11 @@ flags = tf.app.flags.FLAGS
 class DataManager(object):
   def load(self):
     # Load dataset
-    # dataset_zip = np.load('data/megaman.npz')
-    # self.imgs       = dataset_zip['arr_0']
+    dataset_zip = np.load('data/megaman.npz')
+    self.imgs       = dataset_zip['arr_0']
 
-    dataset_zip = h5py.File('data/megaman.hdf5', 'r')
-    self.imgs       = dataset_zip['megaman']
+    # dataset_zip = h5py.File('data/megaman.hdf5', 'r')
+    # self.imgs       = dataset_zip['megaman']
     self.n_samples = self.imgs.shape[0]
     # 27312 for megaman
     
