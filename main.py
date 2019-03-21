@@ -47,11 +47,13 @@ def train(sess,
 
     # Training cycle
     for epoch in range(flags.epoch_size):
+        print('\n===== EPOCH %d =====' % epoch)
         # Shuffle image indices
         random.shuffle(indices)
 
         avg_cost = 0.0
         total_batch = n_samples // flags.batch_size
+        print('>> Total Batch Size: %d' % total_batch)
 
         # Loop over all batches
         for i in range(total_batch):
@@ -60,15 +62,24 @@ def train(sess,
             batch_xs = manager.get_images(batch_indices)
 
             # Fit training using batch data
+            print('>>>> Fitting Batch %d ...' % i, end='')
             reconstr_loss, latent_loss, summary_str = model.partial_fit(sess, batch_xs, step)
+            print('Done')
+
+            print('>>>> Writing Summary ...', end='')
             summary_writer.add_summary(summary_str, step)
+            print('Done')
             step += 1
 
         # Image reconstruction check
+        print('>> Reconstruction check ... ', end='')
         reconstruct_check(sess, model, reconstruct_check_images)
+        print('Done')
 
         # Disentangle check
+        print('>> Disentanglement check...', end='')
         disentangle_check(sess, model, manager)
+        print('Done')
 
         # Save checkpoint
         saver.save(sess, flags.checkpoint_dir + '/' + 'checkpoint', global_step=step)
@@ -115,7 +126,7 @@ def disentangle_check(sess, model, manager, save_original=False):
     for i, zss in enumerate(z_sigma_sq):
         str = "z{0}={1:.4f}".format(i, zss)
         zss_str += str + ", "
-    print(zss_str)
+    # print(zss_str)
 
     # Save disentangled images
     z_m = z_mean[0]
