@@ -30,7 +30,6 @@ tf.app.flags.DEFINE_integer("input_channels", 3, "input image color channels (RG
 
 flags = tf.app.flags.FLAGS
 
-
 def train(sess,
           model,
           manager,
@@ -81,13 +80,17 @@ def train(sess,
         disentangle_check(sess, model, manager)
         print('Done')
 
+        merged = tf.summary.merge_all()
+        summary_str = sess.run(merged)
+        summary_writer.add_summary(summary_str, step)
+
         # Save checkpoint
         saver.save(sess, flags.checkpoint_dir + '/' + 'checkpoint', global_step=step)
 
 
 def reconstruct_check(sess, model, images):
     # Check image reconstruction
-    x_reconstruct = model.reconstruct(sess, images)
+    x_reconstruct, tf_x, tf_x_out = model.reconstruct(sess, images)
 
     if not os.path.exists("reconstr_img"):
         os.mkdir("reconstr_img")
@@ -99,8 +102,13 @@ def reconstruct_check(sess, model, images):
         imsave("reconstr_img/org_{0}.png".format(i), org_img)
         imsave("reconstr_img/reconstr_{0}.png".format(i), reconstr_img)
 
-        tf.summary.image("reconstr_img/org_{0}".format(i), org_img)
-        tf.summary.image("reconstr_img/reconstr_{0}".format(i), reconstr_img)
+
+        # Tensorboard integration
+
+        tf_x_reshaped = tf.reshape(tf_x[i], [flags.input_width, flags.input_height, flags.input_channels])
+        tf_x_out_reshaped = tf.reshape(tf_x_out[i], [flags.input_width, flags.input_height, flags.input_channels])
+        combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 0)
+        tf.summary.image("reconstr_img {0}".format(i), combined_image)
 
 
 def disentangle_check(sess, model, manager, save_original=False):

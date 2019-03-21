@@ -250,7 +250,7 @@ class VAE(object):
     """ Reconstruct given data. """
     # Original VAE output
     return sess.run(self.x_out, 
-                    feed_dict={self.x: xs})
+                    feed_dict={self.x: xs}), self.x, self.x_out
 
   
   def transform(self, sess, xs):
