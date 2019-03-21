@@ -34,7 +34,7 @@ def process(workingpath, filename):
 def extract_id(filename):
     a = filename.split('_')[1] # _number.dat
     b = a.split('.')[0] # number
-    return int(b)
+    return int(b) - 1 # 0-index
 
 
 def main():
