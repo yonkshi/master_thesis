@@ -55,6 +55,8 @@ def train(sess,
         print('>> Total Batch Size: %d' % total_batch)
 
         # Loop over all batches
+        print('training ')
+
         for i in range(total_batch):
             # Generate image batch
             batch_indices = indices[flags.batch_size * i: flags.batch_size * (i + 1)]
@@ -65,9 +67,12 @@ def train(sess,
             summary_writer.add_summary(summary_str, step)
             step += 1
 
+            print('.', end='')
+
         # Image reconstruction check
+        print('')
         print('>> Reconstruction check ... ', end='')
-        reconstruct_check(sess, model, reconstruct_check_images)
+        img_summary = reconstruct_check(sess, model, reconstruct_check_images)
         print('Done')
 
         # # Disentangle check
@@ -75,9 +80,7 @@ def train(sess,
         # disentangle_check(sess, model, manager)
         # print('Done')
 
-        merged = tf.summary.merge_all()
-        summary_str = sess.run(merged)
-        summary_writer.add_summary(summary_str, step)
+        summary_writer.add_summary(img_summary, step)
 
         # Save checkpoint
         saver.save(sess, flags.checkpoint_dir + '/' + 'checkpoint', global_step=step)
@@ -86,7 +89,7 @@ def train(sess,
 def reconstruct_check(sess, model, images):
     # Check image reconstruction
 
-    x_reconstruct, tf_x, tf_x_out = model.reconstruct(sess, images)
+    x_reconstruct, img_summary = model.reconstruct(sess, images)
 
     if not os.path.exists("reconstr_img"):
         os.mkdir("reconstr_img")
@@ -99,13 +102,7 @@ def reconstruct_check(sess, model, images):
         imsave("reconstr_img/org_{0}.png".format(i), org_img)
         imsave("reconstr_img/reconstr_{0}.png".format(i), reconstr_img)
 
-
-        # Tensorboard integration
-        print('>>>> Reconstructing tensorboard image %d ' % i)
-        tf_x_reshaped = tf.reshape(tf_x[i], [flags.input_width, flags.input_height, flags.input_channels])
-        tf_x_out_reshaped = tf.reshape(tf_x_out[i], [flags.input_width, flags.input_height, flags.input_channels])
-        combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 0)
-        tf.summary.image("reconstr_img {0}".format(i), combined_image)
+    return img_summary
 
 
 def disentangle_check(sess, model, manager, save_original=False):
