@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 import random
 import os
+import datetime
 from scipy.misc import imsave
 
 from model import VAE
@@ -27,14 +28,33 @@ tf.app.flags.DEFINE_boolean("training", True, "training or not")
 tf.app.flags.DEFINE_integer("input_width", 128, "input image pixel width")
 tf.app.flags.DEFINE_integer("input_height", 128, "input image pixel height")
 tf.app.flags.DEFINE_integer("input_channels", 3, "input image color channels (RGB default)")
+tf.app.flags.DEFINE_integer("latent_dim", 256, "Dimension of latent space")
+
+tf.app.flags.DEFINE_string("dataset", "Megaman", "log file directory")
 
 flags = tf.app.flags.FLAGS
+
+run_name = "gamma={0}, capacity_lim={1}, latent_dim={2}, input_dim={3}x{4}x{5}, dataset={6}, " \
+           "date={7}".format(flags.gamma,
+                              flags.capacity_limit,
+                              flags.latent_dim,
+                              flags.input_width,
+                              flags.input_height,
+                              flags.input_channels,
+                              flags.dataset,
+                              datetime.datetime.now(),
+                              )
+run_logpath = os.path.join(flags.log_file, run_name)
+if not os.path.exists(run_logpath):
+    os.mkdir(run_logpath)
 
 def train(sess,
           model,
           manager,
           saver):
-    summary_writer = tf.summary.FileWriter(flags.log_file, sess.graph)
+
+
+    summary_writer = tf.summary.FileWriter(run_logpath, sess.graph)
 
     n_samples = manager.sample_size
 
@@ -116,7 +136,8 @@ def disentangle_check(sess, model, manager, save_original=False):
     '''
     img = manager.get_image(1337)
     if save_original:
-        imsave("original.png", img.reshape([flags.input_width, flags.input_height, flags.input_channels]).astype(np.float32))
+        imsave("original.png",
+               img.reshape([flags.input_width, flags.input_height, flags.input_channels]).astype(np.float32))
 
     batch_xs = [img]
     z_mean, z_log_sigma_sq = model.transform(sess, batch_xs)
@@ -131,7 +152,7 @@ def disentangle_check(sess, model, manager, save_original=False):
 
     # Save disentangled images
     z_m = z_mean[0]
-    n_z = 256 # Latent space dim
+    n_z = 256  # Latent space dim
 
     if not os.path.exists("disentangle_img"):
         os.mkdir("disentangle_img")
@@ -148,7 +169,6 @@ def disentangle_check(sess, model, manager, save_original=False):
             reconstr_img = model.generate(sess, z_mean2)
             rimg = reconstr_img[0].reshape([flags.input_width, flags.input_height, flags.input_channels])
             imsave("disentangle_img/check_z{0}_{1}.png".format(target_z_index, ri), rimg)
-
 
 
 def load_checkpoints(sess):
@@ -178,7 +198,7 @@ def main(argv):
         capacity_limit=flags.capacity_limit,
         capacity_change_duration=flags.capacity_change_duration,
         learning_rate=flags.learning_rate,
-                )
+    )
 
     sess.run(tf.global_variables_initializer())
 

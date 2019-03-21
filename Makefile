@@ -4,7 +4,5 @@ up:
 	git push
 
 run:
-	rm -r checkpoints/
-	rm log/*
 	git pull
 	python main.py
