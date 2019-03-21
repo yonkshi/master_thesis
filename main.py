@@ -55,10 +55,11 @@ def train(sess,
         print('>> Total Batch Size: %d' % total_batch)
 
         # Loop over all batches
-        print('training ')
+        print('>> Training ', end='')
 
         for i in range(total_batch):
             # Generate image batch
+            print(".", end='')
             batch_indices = indices[flags.batch_size * i: flags.batch_size * (i + 1)]
             batch_xs = manager.get_images(batch_indices)
 
@@ -66,8 +67,6 @@ def train(sess,
             reconstr_loss, latent_loss, summary_str = model.partial_fit(sess, batch_xs, step)
             summary_writer.add_summary(summary_str, step)
             step += 1
-
-            print('.', end='')
 
         # Image reconstruction check
         print('')

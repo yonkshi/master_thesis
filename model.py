@@ -251,6 +251,12 @@ class VAE(object):
             imgs.append(reconstr_img)
 
         img_summary = tf.summary.merge(imgs)
+
+        tf_x_reshaped = tf.reshape(self.x, [flags.input_width, flags.input_height, flags.input_channels])
+        tf_x_out_reshaped = tf.reshape(self.x_out, [flags.input_width, flags.input_height, flags.input_channels])
+        combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 1)
+        img_summary = tf.summary.image("reconstr_img {0}".format(i), combined_image)
+
         return sess.run([self.x_out, img_summary],
                         feed_dict={self.x: xs})
 
