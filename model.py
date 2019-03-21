@@ -251,7 +251,7 @@ class VAE(object):
             imgs.append(reconstr_img)
 
         img_summary = tf.summary.merge(imgs)
-        return sess.run(self.x_out, img_summary,
+        return sess.run([self.x_out, img_summary],
                         feed_dict={self.x: xs})
 
     def transform(self, sess, xs):
