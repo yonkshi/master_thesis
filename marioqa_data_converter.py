@@ -58,12 +58,12 @@ def main():
             working_path = join(DATA_DIR, dir)
             num_files = len(files) # Last
 
-            ds = f.create_dataset(dir, (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), compression="gzip" )
+            ds = f.create_dataset(dir, (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), compression="lzf" )
             print('>> Now in dir', dir)
             print('>> total files', num_files)
 
             for idx, file in enumerate(files):
-                if idx % 1000 == 0 and idx > 0:
+                if idx % 100 == 0 and idx > 0:
                     print('>>>> Processing file number', idx)
 
                 id = extract_id(file)

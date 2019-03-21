@@ -23,9 +23,9 @@ def main2():
 def main():
     dataset_zip = np.load('data/megaman.npz')
     imgs   = dataset_zip['arr_0']
-
+    print('writing and compressing lzf')
     with h5py.File('data/megaman.hdf5', "w") as f:
-        f.create_dataset('megaman', data = imgs)
+        f.create_dataset('megaman', data = imgs, compression='lzf')
 
 
 if __name__ == '__main__':
