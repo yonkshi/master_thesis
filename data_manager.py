@@ -5,15 +5,17 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
+import h5py
 
 flags = tf.app.flags.FLAGS
 
 class DataManager(object):
   def load(self):
     # Load dataset
-    dataset_zip = np.load('data/megaman.npz')
+    # dataset_zip = np.load('data/megaman.npz')
 
-    self.imgs       = dataset_zip['arr_0']
+    dataset_zip = h5py.File('data/megaman.hdf5', 'r')
+    self.imgs       = dataset_zip['megaman']
     self.n_samples = self.imgs.shape[0]
     # 27312 for megaman
     
