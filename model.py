@@ -54,6 +54,12 @@ class VAE(object):
         # Define loss function and corresponding optimizer
         self._create_loss_optimizer()
 
+        # Tensorboard image preview
+        tf_x_reshaped = tf.reshape(self.x, [-1, flags.input_width, flags.input_height, flags.input_channels])
+        tf_x_out_reshaped = tf.reshape(self.x_out, [-1, flags.input_width, flags.input_height, flags.input_channels])
+        combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 1)
+        self.img_summary = tf.summary.image("reconstr_img", combined_image, max_outputs=100)
+
     def _conv2d_weight_variable(self, weight_shape, name, deconv=False):
         name_w = "W_{0}".format(name)
         name_b = "b_{0}".format(name)
@@ -252,12 +258,7 @@ class VAE(object):
         #
         # img_summary = tf.summary.merge(imgs)
 
-        tf_x_reshaped = tf.reshape(self.x, [-1, flags.input_width, flags.input_height, flags.input_channels])
-        tf_x_out_reshaped = tf.reshape(self.x_out, [-1, flags.input_width, flags.input_height, flags.input_channels])
-        combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 1)
-        img_summary = tf.summary.image("reconstr_img", combined_image)
-
-        return sess.run([self.x_out, img_summary],
+        return sess.run([self.x_out, self.img_summary],
                         feed_dict={self.x: xs})
 
     def transform(self, sess, xs):
