@@ -252,7 +252,7 @@ class VAE(object):
 
         img_summary = tf.summary.merge(imgs)
         return sess.run(self.x_out, img_summary,
-                        feed_dict={self.x: xs}), self.x, self.x_out
+                        feed_dict={self.x: xs})
 
     def transform(self, sess, xs):
         """Transform data by mapping it into the latent space."""
