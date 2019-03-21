@@ -59,7 +59,7 @@ def main():
             num_files = len(files) # Last
 
             ds = f.create_dataset(dir,
-                                  size = (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3),
+                                  shape = (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3),
                                   chunks = (10, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), # 10 images per chunk
                                   compression="lzf")
             print('>> Now in dir', dir)
