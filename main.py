@@ -119,7 +119,7 @@ def disentangle_check(sess, model, manager, save_original=False):
 
     # Save disentangled images
     z_m = z_mean[0]
-    n_z = 10
+    n_z = 256 # Latent space dim
 
     if not os.path.exists("disentangle_img"):
         os.mkdir("disentangle_img")
