@@ -38,7 +38,7 @@ def main():
 
             ls = []
 
-            for dat in os.listdir(DATA_DIR):
+            for dat in os.listdir(subdir):
                 file_path = join(subdir, dat)
                 if dat.endswith('.dat'):
                     id = extract_id(dat)
