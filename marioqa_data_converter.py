@@ -27,8 +27,9 @@ def process(workingpath, filename):
     resized_img = cv2.resize(img,(IMAGE_DIMENSION, IMAGE_DIMENSION))
 
     resized_img = resized_img[..., ::-1] # Convert cv2 BGR to RGB
+    resized_img_normalized = resized_img / 255
 
-    return resized_img
+    return resized_img_normalized
 
 def extract_id(filename):
     a = filename.split('_')[1] # _number.dat
@@ -52,25 +53,25 @@ def main():
                     ls.append(dat)
             files[f] = ls
 
+    with h5py.File(OUT_DATA_DIR + "playdata.hdf5", "w") as f:
+        for dir, files in files.items():
+            working_path = join(DATA_DIR, dir)
+            num_files = len(files) # Last
+
+            ds = f.create_dataset(dir, (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), )
+            print('>> Now in dir', dir)
+
+            for idx, file in enumerate(files):
+                if idx % 100 == 0 and idx > 0:
+                    print('>>>> Processing file number', idx)
+
+                id = extract_id(file)
+                img = process(working_path, file)
+                ds[id] = img
+
+            print('>> Processing complete, writing to HDF5 file')
 
 
-    for dir, files in files.items():
-        working_path = join(DATA_DIR, dir)
-        num_files = len(files) # Last
-
-        matrix = np.ndarray([num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3])
-        print('>> Now in dir', dir)
-        for idx, file in enumerate(files):
-            if idx % 100 == 0 and idx > 0:
-                print('>>>> Processing file number', idx)
-
-            id = extract_id(file)
-            img = process(working_path, file)
-            matrix[id] = img
-
-        print('>> Processing complete, writing to HDF5 file')
-        with h5py.File(OUT_DATA_DIR + "playdata.hdf5", "w") as f:
-            ds = f.create_dataset(dir, matrix.shape, data=matrix)
 
 
 
