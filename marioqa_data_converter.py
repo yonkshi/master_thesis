@@ -58,7 +58,7 @@ def main():
             working_path = join(DATA_DIR, dir)
             num_files = len(files) # Last
 
-            ds = f.create_dataset(dir, (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), )
+            ds = f.create_dataset(dir, (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), compression="gzip" )
             print('>> Now in dir', dir)
 
             for idx, file in enumerate(files):
