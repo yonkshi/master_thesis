@@ -70,10 +70,10 @@ def train(sess,
         reconstruct_check(sess, model, reconstruct_check_images)
         print('Done')
 
-        # Disentangle check
-        print('>> Disentanglement check...', end='')
-        disentangle_check(sess, model, manager)
-        print('Done')
+        # # Disentangle check
+        # print('>> Disentanglement check...', end='')
+        # disentangle_check(sess, model, manager)
+        # print('Done')
 
         merged = tf.summary.merge_all()
         summary_str = sess.run(merged)
