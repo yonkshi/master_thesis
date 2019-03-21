@@ -15,7 +15,7 @@ from data_manager import DataManager
 tf.app.flags.DEFINE_integer("epoch_size", 2000, "epoch size")
 tf.app.flags.DEFINE_integer("batch_size", 64, "batch size")
 tf.app.flags.DEFINE_float("gamma", 100.0, "gamma param for latent loss")
-tf.app.flags.DEFINE_float("capacity_limit", 20.0,
+tf.app.flags.DEFINE_float("capacity_limit", 80.0,
                           "encoding capacity limit param for latent loss")
 tf.app.flags.DEFINE_integer("capacity_change_duration", 100000,
                             "encoding capacity change duration")
@@ -88,6 +88,9 @@ def reconstruct_check(sess, model, images):
         imsave("reconstr_img/org_{0}.png".format(i), org_img)
         imsave("reconstr_img/reconstr_{0}.png".format(i), reconstr_img)
 
+        tf.summary.image("reconstr_img/org_{0}".format(i), org_img)
+        tf.summary.image("reconstr_img/reconstr_{0}".format(i), reconstr_img)
+
 
 def disentangle_check(sess, model, manager, save_original=False):
     '''
@@ -133,6 +136,7 @@ def disentangle_check(sess, model, manager, save_original=False):
             reconstr_img = model.generate(sess, z_mean2)
             rimg = reconstr_img[0].reshape([flags.input_width, flags.input_height, flags.input_channels])
             imsave("disentangle_img/check_z{0}_{1}.png".format(target_z_index, ri), rimg)
+
 
 
 def load_checkpoints(sess):
