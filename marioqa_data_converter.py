@@ -58,7 +58,10 @@ def main():
             working_path = join(DATA_DIR, dir)
             num_files = len(files) # Last
 
-            ds = f.create_dataset(dir, (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), compression="lzf" )
+            ds = f.create_dataset(dir,
+                                  size = (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3),
+                                  chunks = (10, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), # 10 images per chunk
+                                  compression="lzf")
             print('>> Now in dir', dir)
             print('>> total files', num_files)
 

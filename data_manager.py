@@ -13,6 +13,7 @@ class DataManager(object):
   def load(self):
     # Load dataset
     # dataset_zip = np.load('data/megaman.npz')
+    # self.imgs       = dataset_zip['arr_0']
 
     dataset_zip = h5py.File('data/megaman.hdf5', 'r')
     self.imgs       = dataset_zip['megaman']
