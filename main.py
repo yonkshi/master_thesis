@@ -61,13 +61,8 @@ def train(sess,
             batch_xs = manager.get_images(batch_indices)
 
             # Fit training using batch data
-            print('>>>> Fitting Batch %d ...' % i, end='')
             reconstr_loss, latent_loss, summary_str = model.partial_fit(sess, batch_xs, step)
-            print('Done')
-
-            print('>>>> Writing Summary ...', end='')
             summary_writer.add_summary(summary_str, step)
-            print('Done')
             step += 1
 
         # Image reconstruction check
@@ -90,12 +85,14 @@ def train(sess,
 
 def reconstruct_check(sess, model, images):
     # Check image reconstruction
+
     x_reconstruct, tf_x, tf_x_out = model.reconstruct(sess, images)
 
     if not os.path.exists("reconstr_img"):
         os.mkdir("reconstr_img")
 
     for i in range(len(images)):
+        print('>>>> Reconstructing image %d ' % i)
         org_img = images[i].reshape([flags.input_width, flags.input_height, flags.input_channels])
         org_img = org_img.astype(np.float32)
         reconstr_img = x_reconstruct[i].reshape([flags.input_width, flags.input_height, flags.input_channels])
@@ -104,7 +101,7 @@ def reconstruct_check(sess, model, images):
 
 
         # Tensorboard integration
-
+        print('>>>> Reconstructing tensorboard image %d ' % i)
         tf_x_reshaped = tf.reshape(tf_x[i], [flags.input_width, flags.input_height, flags.input_channels])
         tf_x_out_reshaped = tf.reshape(tf_x_out[i], [flags.input_width, flags.input_height, flags.input_channels])
         combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 0)
