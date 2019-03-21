@@ -60,9 +60,10 @@ def main():
 
             ds = f.create_dataset(dir, (num_files, IMAGE_DIMENSION, IMAGE_DIMENSION, 3), compression="gzip" )
             print('>> Now in dir', dir)
+            print('>> total files', num_files)
 
             for idx, file in enumerate(files):
-                if idx % 100 == 0 and idx > 0:
+                if idx % 1000 == 0 and idx > 0:
                     print('>>>> Processing file number', idx)
 
                 id = extract_id(file)
