@@ -6,3 +6,4 @@ transformer/
 __pycache__/
 disentangled_vae/
 tmp/
+checkpoints/
