@@ -55,8 +55,8 @@ class VAE(object):
         self._create_loss_optimizer()
 
         # Tensorboard image preview
-        tf_x_reshaped = tf.reshape(self.x, [-1, flags.input_width, flags.input_height, flags.input_channels])
-        tf_x_out_reshaped = tf.reshape(self.x_out, [-1, flags.input_width, flags.input_height, flags.input_channels])
+        tf_x_reshaped = tf.reshape(self.x, [-1, input_width, input_height, input_channels])
+        tf_x_out_reshaped = tf.reshape(self.x_out, [-1, input_width, input_height, input_channels])
         combined_image = tf.concat([tf_x_reshaped, tf_x_out_reshaped], 1)
         self.img_summary = tf.summary.image("reconstr_img", combined_image, max_outputs=100)
 
