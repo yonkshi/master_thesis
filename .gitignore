@@ -7,3 +7,4 @@ __pycache__/
 disentangled_vae/
 tmp/
 checkpoints/
+.ipynb_checkpoints/
