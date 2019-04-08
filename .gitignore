@@ -8,3 +8,4 @@ disentangled_vae/
 tmp/
 checkpoints/
 .ipynb_checkpoints/
+coinrun/
