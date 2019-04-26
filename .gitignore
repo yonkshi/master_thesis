@@ -9,3 +9,4 @@ tmp/
 checkpoints/
 .ipynb_checkpoints/
 coinrun/
+pycolab/
