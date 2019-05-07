@@ -4,5 +4,7 @@ up:
 	git push
 
 run:
-	git pull
-	python main.py
+	python train.py
+
+sync:
+	rsync -arvu -f '- /*/' -e ssh . naturalreaders:masterthesis

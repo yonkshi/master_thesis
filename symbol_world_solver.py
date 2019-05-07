@@ -21,15 +21,17 @@ def main():
     reward = 0
     print('hello world')
 
-    rewards_set = []
-    obs_set = []
-    action_set = []
+
 
     with h5py.File('data/SymWorld_basic.hdf5', "w") as f:
         ep = 0
         # Loop through episodes
         while ep < 10000:
             if ep % 10 == 0 and ep > 0: print(ep)
+
+            rewards_set = []
+            obs_set = []
+            action_set = []
 
             # Loop through each step
             while True:
