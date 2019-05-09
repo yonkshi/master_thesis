@@ -26,7 +26,7 @@ def main():
     with h5py.File('data/SymWorld_basic.hdf5', "w") as f:
         ep = 0
         # Loop through episodes
-        while ep < 10000:
+        while ep < 5000:
             if ep % 10 == 0 and ep > 0: print(ep)
 
             rewards_set = []
@@ -40,7 +40,7 @@ def main():
 
                 action_vec = action2vec(action, env)
                 action_set.append(action_vec)
-                obs_set.append(obs.board)
+                obs_set.append(np.copy(obs.board))
                 rewards_set.append(reward)
 
 

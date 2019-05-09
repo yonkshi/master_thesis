@@ -4,7 +4,10 @@ up:
 	git push
 
 run:
-	python train.py
+	python3 train.py
 
 sync:
-	rsync -arvu -f '- /*/' -e ssh . naturalreaders:masterthesis
+	rsync -arvu -f '- /*/' -e ssh . naturalreaders:master_thesis
+
+tb:
+	tensorboard --logdir logs_v2 --host 0.0.0.0 --port 8081

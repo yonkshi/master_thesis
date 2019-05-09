@@ -18,8 +18,8 @@ from torch.utils import data
 class HDF5SimpleDataset(torch.utils.data.Dataset):
   def __init__(self, in_file, ep):
     super().__init__()
-    self.file = h5py.File(in_file, 'r')[f'symworld/ep{ep}/']
-    self.n_images = self.file[f'action_set'].shape[0]
+    self.file = h5py.File(in_file, 'r')['symworld/ep%d/' % ep]
+    self.n_images = self.file['action_set'].shape[0]
 
   def __getitem__(self, index):
     ret = {}
@@ -28,8 +28,8 @@ class HDF5SimpleDataset(torch.utils.data.Dataset):
     obs = self.normalize_image(obs)
 
     ret['obs_set'] = np.moveaxis(obs, -1, 0) # move from (x, y, c) to (c, x, y)
-    ret['reward_set'] = self.file['reward_set'][index].astype(np.float32)
-    ret['action_set'] = self.file['action_set'][index].astype(np.float32) / 100  # Reward between [-1, 1]
+    ret['reward_set'] = (self.file['reward_set'][index] / 100).astype(np.float32) # Reward between [-1, 1]
+    ret['action_set'] = self.file['action_set'][index].astype(np.float32)
 
     # Observation at next time step
     obs_t1 = self.file['obs_set'][index+1, ...].astype(np.float32)

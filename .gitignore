@@ -1,6 +1,7 @@
 .idea/*
 data/
 log/
+logs_v2/
 tensor2tensor/
 transformer/
 __pycache__/
