@@ -63,6 +63,35 @@ class SymbolEncoder(nn.Module):
         # Remove last pooling layer and ReLU, replace with Softmax
         layers.popitem()
         # NOTE: Maybe not the best to add ReLU
+        layers['Activation'] = nn.Tanh()
+        self.cnn = nn.Sequential(layers)
+
+    def forward(self, x):
+        return self.cnn(x)
+
+
+class SymbolDecoder(nn.Module):
+    def __init__(self, ):
+        super().__init__()
+        ''' builds the principle CNN for vision'''
+        filter_cfg = [128, 128, 'pool', 64, 3]  # Inverse of the encoder
+        kernel = (3, 3)
+
+        layers = OrderedDict()
+        prev_filter_size = 128  # Initial image has 3 channels
+        for i, f_size in enumerate(filter_cfg):
+            if f_size == 'pool':
+                layers['Upsample_%d' % i] = nn.Upsample(scale_factor=2)
+                continue
+
+            layers['Conv_%d' % i] = nn.ConvTranspose2d(prev_filter_size, f_size, kernel)  # Conv2d
+            layers['ReLU_%d' % i] = nn.ReLU()
+            prev_filter_size = f_size
+            # layers.append(nn.ConvTranspose2d(f_size, f_size, kernel_size=(2, 2), stride=(2, 2))) # Inverse of Avg Pooling
+
+        # Remove last pooling layer and ReLU, replace with Softmax
+        layers.popitem()
+        # NOTE: Maybe not the best to add ReLU
         layers['Activation'] = nn.Sigmoid()
         self.cnn = nn.Sequential(layers)
 
@@ -92,12 +121,11 @@ class SymbolDecoder(nn.Module):
         # Remove last pooling layer and ReLU, replace with Softmax
         layers.popitem()
         # NOTE: Maybe not the best to add ReLU
-        layers['Activation'] = (nn.Tanh())
+        layers['Activation'] = nn.Sigmoid()
         self.cnn = nn.Sequential(layers)
 
     def forward(self, x):
         return self.cnn(x)
-
 
 class SimulatorNet(nn.Module):
     def __init__(self, maneuveur_capacity, symbol_space, symbol_capacity):
