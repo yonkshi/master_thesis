@@ -15,7 +15,8 @@ from models import ManeuvorNetwork, SymbolEncoder, SimulatorNet, SymbolDecoder
 from data_manager import HDF5SimpleDataset
 
 BATCH_SIZE = 32
-SYMBOL_CAPACITY = 128
+SYMBOL_CAPACITY = 64
+SYMBOL_X_Y = 20
 n_iter = 0
 dt = datetime.today().strftime('%b-%d') + '-' + generate_slug(2)
 writer = SummaryWriter('logs_v2/%s' % dt)
@@ -27,15 +28,15 @@ def train():
 
     # init the networks
     maneuNet = ManeuvorNetwork(action_space= 5, maneuveur_capacity=15).to(device)
-    symEncoder = SymbolEncoder().to(device)
-    symDecoder = SymbolDecoder().to(device)
-    simulator = SimulatorNet(maneuveur_capacity= 15, symbol_space=19, symbol_capacity= SYMBOL_CAPACITY, ).to(device)
+    symEncoder = SymbolEncoder(symbol_capacity = SYMBOL_CAPACITY).to(device)
+    symDecoder = SymbolDecoder(symbol_capacity = SYMBOL_CAPACITY).to(device)
+    simulator = SimulatorNet(maneuveur_capacity= 15, symbol_space=SYMBOL_X_Y, symbol_capacity= SYMBOL_CAPACITY, ).to(device)
 
     params = list(maneuNet.parameters()) + list(symEncoder.parameters()) + list(symDecoder.parameters()) + list(simulator.parameters())
     sim_optim = optim.Adam(params)
 
     params = list(symEncoder.parameters()) + list(symDecoder.parameters())
-    ae_optim = optim.Adam(params)
+    ae_optim = optim.Adam(params, lr=1e-5, weight_decay=1e-7)
 
     n_iter = 0
     data = HDF5SimpleDataset('data/SymWorld_basic.hdf5')
@@ -61,9 +62,10 @@ def train():
             print(2)
             m = maneuNet(action)
             o_t0 = symEncoder(s_t0)
-            o_t1_predicted, reward_out = simulator(o_t0, m)
+            # o_t1_predicted, reward_out = simulator(o_t0, m)
             # s_decoded = symDecoder(o_t0)
             # ae_loss = F.mse_loss(s_decoded, s_t0)
+            visualize_weights(maneuNet=maneuNet, symEncoder=symEncoder, symDecoder=symDecoder, simulator=simulator)
             ae_losses, ae_inputs, ae_outputs = local_vae_loss(symDecoder, o_t0, s_t0, ae_optim)
             ae_loss_mean = torch.mean(ae_losses)
 
@@ -78,12 +80,12 @@ def train():
             visualize_ae(ae_inputs, ae_outputs, ae_losses)  # FIXME Temporarily placed here
 
             # [N,1] -> [N]
-            reward_out = reward_out[:,0]
+            # reward_out = reward_out[:,0]
 
             # Building the loss
-            L_symbol = F.mse_loss(o_t1_predicted, o_t1) #
-            L_reward = F.mse_loss(reward_out, reward)
-            loss = L_symbol + L_reward
+            L_symbol = 0 # F.mse_loss(o_t1_predicted, o_t1) #
+            L_reward = 0 # F.mse_loss(reward_out, reward)
+            loss = 0 #  L_symbol + L_reward
             print(4)
             # loss.backward(retain_graph=True)
             # sim_optim.step()
@@ -115,10 +117,10 @@ def train():
                   )
             print(8)
 
-            if n_iter % 20 == 0:
+            if n_iter % 2 == 0:
                 visualize_omap(s_t0, o_t0)
                 # visualize_ae(ae_inputs, ae_outputs)
-                visualize_weights(maneuNet=maneuNet, symEncoder=symEncoder, symDecoder=symDecoder, simulator=simulator)
+                # visualize_weights(maneuNet=maneuNet, symEncoder=symEncoder, symDecoder=symDecoder, simulator=simulator)
                 print('>>>>>> 4.5')
 
 
@@ -253,9 +255,10 @@ def local_vae_loss(decoder:SymbolDecoder, o_t0:torch.Tensor, s_t0:torch.Tensor, 
     h_arange = torch.randperm(H)
     w_range = torch.randperm(W)
 
-    max = 0
-    for i in h_arange:
-        for j in w_range:
+    prev_max = 0
+    print('computing autoencoder loss ')
+    for _i, i in enumerate(h_arange):
+        for _j, j in enumerate(w_range):
             ae_optim.zero_grad()
 
             decoded_batch = decoder(obj[i,j,...])
@@ -266,17 +269,17 @@ def local_vae_loss(decoder:SymbolDecoder, o_t0:torch.Tensor, s_t0:torch.Tensor, 
             losses[i,j] = float(loss)
 
             decoded_detach = decoded_batch.detach().cpu().numpy()
-            # print('mean',np.mean(decoded_detach), 'max',np.max(decoded_detach), 'min',np.min(decoded_detach))
 
+            pc = (_i * H + _j) / (H * W) * 100 # percentage completed
+            if pc >= prev_max:
+                print('\t\t\t{:.0f}%'.format(pc), end="\r")
+                prev_max = np.ceil(pc)
+            # print('mean',np.mean(decoded_detach), 'max',np.max(decoded_detach), 'min',np.min(decoded_detach))
+    print('')
 
 
 
     return losses,  input_sliced, decoded,
-
-
-
-
-    print("hello world")
 
 
 
